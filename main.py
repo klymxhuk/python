@@ -21,7 +21,6 @@ from kivy.uix.dropdown import DropDown
 from kivymd.uix.button import MDFlatButton
 from datetime import datetime
 import calendar
-#from kivy.clock import Clock
 import timeit
 from kivy.uix.button import Button
 from kivymd.uix.label import MDLabel
@@ -182,34 +181,10 @@ class rkv_api:
                                            'pass': self.Password
                                            })
         except:
-            #array_id_for_new['id'] = 1
-            #array_text_for_new['id'] = 1
-            #array_for_new = [array_id_for_new, array_text_for_new]
-            #try:
-                #f = open('new_work_do.txt', 'r', encoding="utf-8")
-            #except:
-                #f = open('new_work_do.txt', 'w', encoding="utf-8")
-                #array_for_new = [array_for_new,]
-                #f.write(json.dumps(array_for_new, ensure_ascii=False))
-                #f.close()
-            #else:
-                #f =  open('new_work_do.txt', 'r', encoding="utf-8")
-                #update_array_for_new = json.loads(f.read())
-                #print(update_array_for_new)
-                #update_array_for_new.append(array_for_new)
-                #print(update_array_for_new)
-                #f.close()
-                #f = open('new_work_do.txt', 'w', encoding="utf-8")
-                #f.write(json.dumps(update_array_for_new, ensure_ascii=False))
-                #f.close()
-            # print('нет соединения тип работ')
-            # with open('do_work_list.txt', 'r', encoding="utf-8") as f:
-            # return json.loads(f.read())
+
             return {'status': 'no_link'}
         else:
-            # self.last_id_do_work = 0
-            # with open('do_work_list.txt', 'w', encoding="utf-8") as f:
-            # f.write(res.text)
+
             return json.loads(res.text)
 
     def update_work_do(self, array_for_update, id_update_item):
