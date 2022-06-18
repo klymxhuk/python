@@ -6,11 +6,8 @@ import requests
 import json
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
-#from kivy.properties import VariableListProperty
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
-#from kivymd.uix.gridlayout import MDGridLayout
-#from kivymd.uix.stacklayout import StackLayout
 from kivymd.uix.card import MDCardSwipe
 from kivymd.uix.card import MDCard
 from kivy.properties import StringProperty
@@ -24,16 +21,18 @@ import calendar
 import timeit
 from kivy.uix.button import Button
 from kivymd.uix.label import MDLabel
-DOUBLE_TAP_TIME = 0.2   # Change time in seconds
-LONG_PRESSED_TIME = 0.9  # Change time in seconds
-MAX_TIME = 1/30.
-MAX_TIME_GROUP = 1/60.
-#import os
 from kivy.clock import Clock, _default_time as time
 from kivymd.uix.card import MDSeparator
 from kivy.core.window import Window
-from kivy.effects.scroll import ScrollEffect
 
+
+
+DOUBLE_TAP_TIME = 0.2   # Change diley time between tap in seconds (for MDCard "work_do")
+LONG_PRESSED_TIME = 0.9  # Change time in seconds for long press (for MDCard "work_do")
+MAX_TIME = 1/30. #time for bilding dropdown list
+MAX_TIME_GROUP = 1/60. # time for bilding work_do list
+
+#class for connect with CRM rukovoditel
 class rkv_api:
     def __init__(self, app_instance):
         super().__init__()
@@ -62,7 +61,6 @@ class rkv_api:
         self.new_do_work = 0
 
     def init(self):
-        print('34')
         try:
             f = open('config.txt', 'r')
         except:
@@ -77,7 +75,6 @@ class rkv_api:
                 try:
                     res = requests.post(url, data={"login": conf[0], 'pass': conf[1]})
                 except:
-                    print('no_link')
                     self.Login = conf[0]
                     self.Password = conf[1]
                     self.work_list = self.get_work_list(off_line=True)
@@ -91,7 +88,6 @@ class rkv_api:
                 else:
                     self.Flag_connection = True
                     answer = json.loads(res.text)
-                    print(res.text)
                     if answer['status'] == 'success':
                         self.Flag_authent = True
                         self.Login = conf[0]
@@ -102,7 +98,6 @@ class rkv_api:
                         self.users_list = self.get_users_list()
                         self.equipment_list = self.get_equipment_list()
                         self.complex_list = self.get_complex_list()
-                        # self.users_on_object_list = self.get_users_on_object('41')
                         return ('ok')
                     else:
                         self.Login = conf[0]
@@ -126,7 +121,6 @@ class rkv_api:
             else:
                 self.Flag_connection = True
                 answer = json.loads(res.text)
-                print(res.text)
                 if answer['status'] == 'success':
                     self.Flag_authent = True
                     with open('config.txt', 'w', encoding="utf-8") as f:
@@ -146,7 +140,6 @@ class rkv_api:
         if self.work_list == 0:
             url = self.srv_adress + 'get_work_list.php'
             if off_line:
-                print('нет соединения выполнения')
                 with open('work_list.txt', 'r', encoding="utf-8") as f:
                     return json.loads(f.read())
             else:
@@ -156,7 +149,6 @@ class rkv_api:
                                                    'pass': self.Password
                                                    })
                 except:
-                    print('нет соединения выполнения')
                     with open('work_list.txt', 'r', encoding="utf-8") as f:
                         return json.loads(f.read())
                 else:
@@ -181,10 +173,8 @@ class rkv_api:
                                            'pass': self.Password
                                            })
         except:
-
             return {'status': 'no_link'}
         else:
-
             return json.loads(res.text)
 
     def update_work_do(self, array_for_update, id_update_item):
@@ -223,7 +213,6 @@ class rkv_api:
         if self.do_work_list == 0 or date_end != self.date_end or reload:
             url = self.srv_adress + 'get_work_do.php'
             if off_line:
-                print('нет соединения тип работ')
                 with open('do_work_list.txt', 'r', encoding="utf-8") as f:
                     return json.loads(f.read())
             else:
@@ -236,7 +225,6 @@ class rkv_api:
 
                                                    })
                 except:
-                    print('нет соединения тип работ')
                     with open('do_work_list.txt', 'r', encoding="utf-8") as f:
                         return json.loads(f.read())
                 else:
@@ -251,7 +239,6 @@ class rkv_api:
         if self.equipment_list == 0:
             url = self.srv_adress + 'get_equipment.php'
             if off_line:
-                print('нет соединения оборудования')
                 with open('equipment_list.txt', 'r', encoding="utf-8") as f:
                     return json.loads(f.read())
             else:
@@ -261,7 +248,6 @@ class rkv_api:
                         'pass': self.Password
                     })
                 except:
-                    print('нет соединения оборудования')
                     with open('equipment_list.txt', 'r', encoding="utf-8") as f:
                         return json.loads(f.read())
                 else:
@@ -275,7 +261,6 @@ class rkv_api:
         if self.complex_list == 0:
             url = self.srv_adress + 'get_complex.php'
             if off_line:
-                print('нет соединения сложность')
                 with open('complex_list.txt', 'r', encoding="utf-8") as f:
                     return json.loads(f.read())
             else:
@@ -283,7 +268,6 @@ class rkv_api:
                     res = requests.post(url, data={'find_word': ''
                                                    })
                 except:
-                    print('нет соединения сложность')
                     with open('complex_list.txt', 'r', encoding="utf-8") as f:
                         return json.loads(f.read())
                 else:
@@ -297,7 +281,6 @@ class rkv_api:
         if self.object_list == 0:
             url = self.srv_adress + 'get_object_for_user.php'
             if off_line:
-                print('нет соединения объекты')
                 with open('object_list.txt', 'r', encoding="utf-8") as f:
                     return json.loads(f.read())
             else:
@@ -306,7 +289,6 @@ class rkv_api:
                                                    'pass': self.Password
                                                    })
                 except:
-                    print('нет соединения объекты')
                     with open('object_list.txt', 'r', encoding="utf-8") as f:
                         return json.loads(f.read())
                 else:
@@ -319,7 +301,6 @@ class rkv_api:
     def get_users_list(self, off_line=False):
         url = self.srv_adress + 'get_user_list.php'
         if off_line:
-            print('нет соединения пользователи')
             with open('users_list.txt', 'r', encoding="utf-8") as f:
                 users_list = json.loads(f.read())
             for user in users_list['data']:
@@ -334,7 +315,6 @@ class rkv_api:
                     'pass': self.Password
                 })
             except:
-                print('нет соединения пользователя')
                 with open('users_list.txt', 'r', encoding="utf-8") as f:
                     users_list = json.loads(f.read())
                 for user in users_list['data']:
@@ -356,7 +336,6 @@ class rkv_api:
         for on_object in self.object_list['data']:
             if on_object['id'] == id_object:
                 users_on_object = on_object['161'].split(',')
-                # print(users_on_object)
                 break
         user_list_with_id = {'data': []}
         for user_on_object in users_on_object:
@@ -365,16 +344,7 @@ class rkv_api:
                     user_list_with_id['data'].append({'id': user['id'], '8': user['8']})
         return user_list_with_id
 
-
-#       url = self.srv_adress+'get_work_do.php'
-#       print(self.date_start)
-#       res = requests.post(url, data={"work_object": work_object,
-#                     'date_start': self.date_start,
-#                     'date_end': self.date_end})
-#       self.last_id_do_work = 0
-#       print(json.loads(res.text))
-#       return json.loads(res.text)
-
+#kivy widgets modifiy-------------------------------------------------------------------------------------------------
 class ContentNavigationDrawer(MDBoxLayout):
     screen_manager = ObjectProperty()
     nav_drawer = ObjectProperty()
@@ -430,9 +400,7 @@ class SwipeToDeleteItem(MDCard):
                     if self.collide_point(touch.x, touch.y):
                         stop = timeit.default_timer()
                         awaited = stop - self.start
-                        print (awaited)
                         if awaited > LONG_PRESSED_TIME and awaited < 5:
-                            print('long')
                             self.dispatch('on_long_press')
                             self.start = 0
                         else:
@@ -475,6 +443,7 @@ class Button_ok(MDFlatButton):
 
 class Button_cancel(MDFlatButton):
     instance = ObjectProperty()
+#kivy widgets modifiy-------------------------------------------------------------------------------------------------
 
 
 class MyApp(MDApp):
@@ -490,22 +459,20 @@ class MyApp(MDApp):
         self.rkv = rkv_api(self)
         self.dropdown = CustomDropDown()
         self.activ_text_field = 0
-        self.loop = 0
-        self.loop_work_do = 0
-        self.item_for_builder = []
+        self.loop = 0   # for store schedule_interval of object Clock for dropdown list
+        self.loop_work_do = 0 # for store schedule_interval of object Clock for work_do list
+        self.item_for_builder = []  #array for builder dropdown list
         self.Flag_color = False
-        self.item_for_groupe_bilder = {}
+        self.item_for_groupe_bilder = {} #array for builder work_do list
         self.last_object_group_bilder=0
-        self.count = 0
-        self.scroll =0
-        # self.init_date_range = self.date_start + '/' + self.date_end
+        self.count = 0 #caunt what times build item for bulding list
+        self.scroll =0 #Link for scroll view (work_do list)
 
+# method for chaing position scroll view on first item, when window was restore
     def win(self,*args):
         var = len(self.root.ids.md_list.children)
-        print (var)
         self.root.ids.scroll_do_work.do_scroll_y = True
         self.root.ids.scroll_do_work.scroll_to(self.root.ids.md_list.children[var-1], padding=10, animate=False)
-        print('разверн')
 
 
     def on_start(self):
@@ -518,7 +485,6 @@ class MyApp(MDApp):
             self.root.ids.singup_btn.text = 'Выйти'
             if self.rkv.Flag_connection:
                 self.load_items(self.rkv.work_list, self.rkv.do_work_list)
-                print(self.rkv.do_work_list)
                 if not self.rkv.Flag_authent:
                     self.root.ids.md_list.add_widget(
                         MDFlatButton(text='Логин или пароль не верны...', pos_hint={"center_x": .5, "center_y": .5}))
@@ -546,24 +512,16 @@ class MyApp(MDApp):
             instance.text = 'Войти в систему'
 
     def bilder_for_grope_list(self, *args):
-        print('loop')
-        print(self.loop_work_do.is_triggered)
         if not self.item_for_groupe_bilder and self.loop_work_do or self.count>=4:
-            print('stop')
             self.loop_work_do.cancel()
-            print(self.loop_work_do.is_triggered)
         while self.item_for_groupe_bilder and time() < (Clock.get_time() + MAX_TIME_GROUP):
             if self.count<4:
-                print(self.count)
                 keys = list(self.item_for_groupe_bilder.keys())
-                print(keys)
                 key_object = keys[0]
                 object_name = list(filter(lambda x: x['id'] == key_object,
                                           self.rkv.object_list['data'])).pop()
                 if self.item_for_groupe_bilder[key_object]:
-                    print(self.item_for_groupe_bilder[key_object])
                     if self.last_object_group_bilder != key_object:
-                        print(key_object)
                         self.last_object_group_bilder = key_object
 
                         self.root.ids.md_list.add_widget(
@@ -592,14 +550,10 @@ class MyApp(MDApp):
 
 
     def group_by_object(self, instance, Flag_reload=False):
-
-        #self.root.ids.md_list1.size
-        print(self.root.ids.md_list1.size)
         if self.Flag_group_by_object and self.rkv.Flag_config or Flag_reload:
             self.Flag_group_by_object = False
             Flag_color = True
             self.item_for_groupe_bilder = {}
-            #self.rkv.last_id_do_work = 0
             self.last_object_group_bilder = 0
             for work_item in self.rkv.do_work_list['data']:
                 if self.item_for_groupe_bilder.get(work_item['parent_item_id']):
@@ -607,7 +561,6 @@ class MyApp(MDApp):
                 else:
                     self.item_for_groupe_bilder[work_item['parent_item_id']] = []
                     self.item_for_groupe_bilder[work_item['parent_item_id']].append(work_item)
-            print(self.item_for_groupe_bilder)
             self.root.ids.md_list.clear_widgets()
             self.count = 0
             self.loop_work_do = Clock.schedule_interval(self.bilder_for_grope_list, 0)
@@ -639,7 +592,6 @@ class MyApp(MDApp):
 
     def on_save(self, instance, value, date_range):
         if date_range:
-
             date_start = date_range[0].strftime("%Y-%m-%d")
             date_end = date_range[-1].strftime("%Y-%m-%d")
             self.root.ids.toolbar.title = f'{self.rkv.date_start}/{self.rkv.date_end}'
@@ -653,19 +605,11 @@ class MyApp(MDApp):
         '''Events called when the "CANCEL" dialog box button is clicked.'''
 
 
-    # @staticmethod
-    # def remove_item(instance):
-    # self.root.ids.md_list.
-    # instance.parent.parent.parent.remove_widget(instance.parent.parent)
-
     def remove_item(self, instance):
         result = self.rkv.remove_work_do(instance.work_do['id'])
         if result != 'no_link':
             if result != 'error':
-                print (len(instance.parent.children))
-                print (instance.parent.children)
                 if not self.Flag_group_by_object and len(instance.parent.children)<=2:
-                    print(self.Flag_group_by_object)
                     instance.parent.parent.remove_widget(instance.parent)
                 else:
                     instance.parent.remove_widget(instance)
@@ -689,21 +633,12 @@ class MyApp(MDApp):
             )
         self.dialog.open()
 
-        # self.root.ids.md_list.remove_widget(instance)
-
 
     def update_item(self, instance):
-        print(instance.work_do['id'])
-
         instance_root = instance
-        #FrontBox = instance.parent.parent.ids.FrontBox
-        #SwipeBox = instance.parent.parent.ids.SwipeBox
         id_work_do = instance_root.work_do['id']
         amount = instance_root.work_do['224']
-        print(instance_root.work_do)
-
         object = list(filter(lambda x: x['id'] == instance_root.work_do['parent_item_id'], self.rkv.object_list['data'])).pop()
-
         if instance_root.work_do['252']:
             equipment = list(
                 filter(lambda x: x['251'] == instance_root.work_do['252'], self.rkv.equipment_list['data'])).pop()
@@ -721,20 +656,14 @@ class MyApp(MDApp):
         if self.Flag_AddNew == 0 and self.rkv.Flag_config:
             if self.rkv.Flag_connection:
                 if self.rkv.Flag_authent:
-                        # instance_root.height = 0
                     instance_root.clear_widgets()
                     instance_root.add_widget(AddNewWork(text='hello'))
                     self.Flag_AddNew = 1
-
                     self.dropdown = CustomDropDown()
             else:
                 instance_root.clear_widgets()
                 instance_root.add_widget(AddNewWork(text='hello'))
                 self.Flag_AddNew = 1
-                    # button = self.root.ids.new.children[0].ids.worker.add_widget(
-                    #    Worker_item(name_worker=self.rkv.user_secondname, id_worker=self.rkv.user_id)
-                    # )
-                    # self.root.ids.new.children[0].children[2].bind(on_double_tap=dropdown.open)
                 self.dropdown = CustomDropDown()
         instance_root.unbind(on_long_press=self.open_remove_dialog)
         instance_root.unbind(on_double_press=self.update_item)
@@ -769,19 +698,14 @@ class MyApp(MDApp):
 
 
     def bilder_for_list(self, *args):
-        print(self.loop_work_do.is_triggered)
         if not self.item_for_groupe_bilder and self.loop_work_do or self.count>=4:
-            print('stop')
             self.loop_work_do.cancel()
-            print(self.loop_work_do.is_triggered)
         while self.item_for_groupe_bilder and time() < (Clock.get_time() + MAX_TIME_GROUP):
             if self.count<4:
-                print(self.count)
                 self.count += 1
                 work_do_item = self.item_for_groupe_bilder.pop(0)
                 object_name = list(filter(lambda x: x['id'] == work_do_item['parent_item_id'],
                                           self.rkv.object_list['data'])).pop()
-                print(work_do_item['226'])
                 unit_name = list(filter(lambda x: x['id'] == work_do_item['226'],
                                           self.rkv.work_list['data'])).pop()
                 self.root.ids.md_list.add_widget(
@@ -789,7 +713,6 @@ class MyApp(MDApp):
                 )
                 self.root.ids.md_list.children[0].bind(on_long_press=self.open_remove_dialog)
                 self.root.ids.md_list.children[0].bind(on_double_press=self.update_item)
-
 
     def load_items(self, work_list=0, work_do_list=0):
         if work_do_list != 0:
@@ -799,9 +722,7 @@ class MyApp(MDApp):
             self.root.ids.md_list.clear_widgets()
             self.count = 0
             self.item_for_groupe_bilder = work_do_list['data'].copy()
-            print(self.item_for_groupe_bilder)
             self.loop_work_do = Clock.schedule_interval(self.bilder_for_list, 0)
-
 
         if work_list != 0:
             kollwork = 0
@@ -821,7 +742,6 @@ class MyApp(MDApp):
                 else:
                     break
 
-
     def add_work(self):
         if self.Flag_AddNew == 0 and self.rkv.Flag_config:
             if self.rkv.Flag_connection:
@@ -838,17 +758,10 @@ class MyApp(MDApp):
                 button = self.root.ids.new.children[0].ids.worker.add_widget(
                     Worker_item(name_worker=self.rkv.user_secondname, id_worker=self.rkv.user_id)
                 )
-                # self.root.ids.new.children[0].children[2].bind(on_double_tap=dropdown.open)
                 self.dropdown = CustomDropDown()
-            # widget.bind(text=on_text)
-            # self.root.ids.new.children[0].children[1].bind(text=self.on_text)
-            # self.root.ids.new.children[0].children[1].bind(text=self.on_text)
-            # print(self.root.ids.new.children[0])
-        # else:
-        # self.root.ids.new.height = self.height
 
 
-    def button_save_new(self, instance):  # dropdown_fields, text_fields, worker_field):
+    def button_save_new(self, instance):
         Flag_error = False
         if instance.ids.object.name == 'error':
             instance.ids.object.line_color_normal = (1, 0, 0, 1)
@@ -867,7 +780,7 @@ class MyApp(MDApp):
             Flag_error = True
 
         if not Flag_error:
-            if type(instance.parent).__name__ == 'MDBoxLayout':
+            if type(instance.parent).__name__ == 'MDBoxLayout': #if is a new work
                 object_name = instance.ids.object.text
                 worker_id_list = ''
                 worker_name_list = ''
@@ -923,7 +836,7 @@ class MyApp(MDApp):
                     self.dialog.open()
 
 
-            else:
+            else: #if is update work
                 array_for_update = {}
                 array_for_card = list(
                     filter(lambda x: x['id'] == instance.parent.work_do['id'], self.rkv.do_work_list['data'])).pop()
@@ -960,7 +873,6 @@ class MyApp(MDApp):
                 result = self.rkv.update_work_do(array_for_update, instance.parent.work_do['id'])
 
                 if result == 'success':
-                    print('sucsess')
                     FrontBox = instance.parent
                     unit_name = FrontBox.unit_name
                     FrontBox.clear_widgets()
@@ -985,11 +897,7 @@ class MyApp(MDApp):
 
     def button_close_new(self, instance):
         if type(instance.parent).__name__ == 'SwipeToDeleteItem':
-            #work_do = list(filter(lambda x: x['id'] == instance.parent.name, self.rkv.do_work_list['data'])).pop()
-            #object = list(filter(lambda x: x['id'] == work_do['parent_item_id'], self.rkv.object_list['data'])).pop()
             FrontBox = instance.parent
-
-            print(FrontBox.unit_name)
             unit_name = FrontBox.unit_name
             FrontBox.clear_widgets()
             FrontBox.add_widget(
@@ -999,7 +907,6 @@ class MyApp(MDApp):
             FrontBox.bind(on_long_press=self.open_remove_dialog)
 
         else:
-            print(instance.parent)
             self.root.ids.new.clear_widgets()
         self.Flag_AddNew = 0
 
@@ -1023,14 +930,12 @@ class MyApp(MDApp):
                 if instance == root.ids.amount:
                     if value != '' and value.isdigit():
                         instance.name = 'not_error'
-                        print('not_error')
                     else:
                         instance.name = 'error'
-                        print('error')
 
     def list_builder(self, *args):
         while self.item_for_builder and time() < (Clock.get_time() + MAX_TIME):
-            item = self.item_for_builder.pop(0)  # i want the first one
+            item = self.item_for_builder.pop(0)  # I want the first one
             self.dropdown.add_widget(
                 ItemForDropDown(name_item=item[0], id_item=item[1])
             )
@@ -1060,7 +965,6 @@ class MyApp(MDApp):
                         element_for_item.append(item['id'])
                         self.item_for_builder.append(element_for_item)
         else:
-            print('notfocus')
             self.loop.cancel()
             self.item_for_builder = []
 
@@ -1085,7 +989,6 @@ class MyApp(MDApp):
                 )
         else:
             self.dropdown.dismiss()
-            # self.dropdown.bind(on_select=lambda instance, x: self.root.ids.new.children[0].children[1].text=instance.text)
             self.activ_text_field.text = text
             self.activ_text_field.name = id_item
             self.activ_text_field.parent.name = 'edit'
@@ -1102,13 +1005,10 @@ class MyApp(MDApp):
                     ItemForDropDown(name_item=worker['8'], id_item=worker['id'])
                 )
 
-
     def click_drop_worker(self, text, id_item):
         pass
-        # self.activ_text_field.error = False
-        # print (self.activ_text_field.name)
 
-
+#start load after event overscroll (start_event_load)
     def start_load(self, scroll):
         if self.Flag_Update_List:
             self.Flag_Update_List = False
@@ -1120,13 +1020,11 @@ class MyApp(MDApp):
                         self.count = 0
                         self.loop_work_do = Clock.schedule_interval(self.bilder_for_list, 0)
                         self.root.ids.scroll_do_work.do_scroll_y = True
-                    #self.load_items(0, self.rkv.do_work_list)
                 else:
                     if not self.loop_work_do.is_triggered:
                         self.count = 0
                         self.loop_work_do = Clock.schedule_interval(self.bilder_for_grope_list, 0)
                         self.root.ids.scroll_do_work.do_scroll_y = True
-
 
         elif self.Flag_Reload_List:
             self.Flag_Reload_List = False
@@ -1146,17 +1044,10 @@ class MyApp(MDApp):
         self.root.ids.spiner.active = False
 
 
-
+    # event overscroll for scrollview
     def start_event_load(self, scroll):
         if scroll.scroll_y< -2.0 or scroll.scroll_y>3.0:
-            print(scroll.scroll_y)
             self.root.ids.scroll_do_work.do_scroll_y = False
-            #self.root.ids.scroll_do_work.do_scroll_y = True
-            #self.root.ids.scroll_do_work.scroll_to(self.root.ids.md_list.children[var - 1], padding=10, animate=False)
-        #if scroll.scroll_y > 1:
-            #print(scroll.scroll_y)
-            #print(scroll.children[0].children[0].size[1])
-            #print(scroll.children[0].size[1] * scroll.scroll_y - scroll.children[0].size[1])
         if (scroll.children[0].size[1] * scroll.scroll_y) < -700:
             self.Flag_Update_List = True
         elif scroll.scroll_y > 1:
@@ -1499,7 +1390,7 @@ MDScreen:
             id: object
             multiline: True
             hint_text: "Multi-line text"
-            font_size: Window.width/18
+            font_size: Window.width/20
             #text_color: 0,0,0,1
             #line_color_normal: 1, 0, 0, 1
             hint_text: "Объект"
@@ -1558,7 +1449,7 @@ MDScreen:
             name: 'error'
             id: work_type
             multiline: True
-            font_size: Window.width/18
+            font_size: Window.width/20
             hint_text: "Multi-line text"
             text_color: 0,0,0,1
             helper_text_mode: "on_focus"
@@ -1581,7 +1472,7 @@ MDScreen:
                 MDTextField:
                     name: 'error'
                     id: amount
-                    font_size: Window.width/18
+                    font_size: Window.width/20
                     #text_color: 0,0,0,1
                     hint_text: "Колличество"
                     helper_text: "Введите колличество"
@@ -1596,7 +1487,7 @@ MDScreen:
                 MDTextField:
                     name: 'error'
                     id: complex
-                    font_size: Window.width/18
+                    font_size: Window.width/20
                     text_color_normal: 0, 1, 0, 1
                     hint_text: "Сложность работ"
                     helper_text: "Выберите сложность"
@@ -1611,6 +1502,7 @@ MDScreen:
             name: 'not_edit'
             MDTextField:
                 name: 'error'
+                hint_lbl_font_size: 60
                 id: equipment
                 multiline: True
                 font_size: Window.width/18
@@ -1673,7 +1565,7 @@ MDScreen:
     text: root.name_item
     color: 0,0,0,1
     height: self.texture_size[1]+10
-    font_size: Window.width/19
+    font_size: Window.width/18
     on_release:app.click_drop_item(root.name_item, root.id_item)
     canvas.before:
         Color:
