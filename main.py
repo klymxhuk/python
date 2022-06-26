@@ -542,8 +542,11 @@ class MyApp(MDApp):
                         self.root.ids.md_list.children[0].add_widget(
                             SwipeToDeleteItem(work_do=work_do_item, object_name=object_name['158'], unit_name = unit_name['243'])
                         )
-                        self.root.ids.md_list.children[0].children[0].bind(on_long_press=self.open_remove_dialog)
-                        self.root.ids.md_list.children[0].children[0].bind(on_double_press=self.update_item)
+
+                        if work_do_item['254'] == 'нет':
+                            self.root.ids.md_list.children[0].children[0].md_bg_color = (1, 1, 1, 0.6)
+                            self.root.ids.md_list.children[0].children[0].bind(on_long_press=self.open_remove_dialog)
+                            self.root.ids.md_list.children[0].children[0].bind(on_double_press=self.update_item)
                 else:
                     self.item_for_groupe_bilder.pop(key_object)
 
@@ -711,8 +714,10 @@ class MyApp(MDApp):
                 self.root.ids.md_list.add_widget(
                     SwipeToDeleteItem(work_do=work_do_item, object_name=object_name['158'], unit_name=unit_name['243'])
                 )
-                self.root.ids.md_list.children[0].bind(on_long_press=self.open_remove_dialog)
-                self.root.ids.md_list.children[0].bind(on_double_press=self.update_item)
+                if work_do_item['254']=='нет':
+                    self.root.ids.md_list.children[0].md_bg_color = (1,1,1,0.6)
+                    self.root.ids.md_list.children[0].bind(on_long_press=self.open_remove_dialog)
+                    self.root.ids.md_list.children[0].bind(on_double_press=self.update_item)
 
     def load_items(self, work_list=0, work_do_list=0):
         if work_do_list != 0:
